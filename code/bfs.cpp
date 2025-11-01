@@ -23,8 +23,14 @@ graph_t read_graph(std::string path) {
     graph_t graph = graph_t();
     if (ifstream.is_open()) {
         std::string line;
+        int64_t i = 0;
         while (std::getline(ifstream, line)) {
-            lines.push_back(std::move(line));
+            auto nums = split_string(std::move(line), ",");
+            graph.push_back(vector<int64_t>());
+            for (auto& num_str : nums) {
+                graph[i].push_back(std::stoll(num_str));
+            }
+            ++i;
         }
         ifstream.close();
     }
@@ -32,23 +38,22 @@ graph_t read_graph(std::string path) {
     return graph;
 }
 
-int main(int argc, char** argv) {
-    auto res = split_string("1:1,2,3,4", const std::string& delimiter) return 0;
-    graph_t graph = read_graph("path");
+int main() {
+    graph_t graph = read_graph("graph_test.txt");
 
     used = vector<bool>(graph.size(), false);
     dst = vector<int64_t>(graph.size(), -1);
 
-    queue<int> q;
+    queue<int64_t> q;
     q.push(0);
     used[0] = true;
     dst[0] = 0;
 
     while (!q.empty()) {
-        int cur = q.front();
+        int64_t cur = q.front();
         q.pop();
 
-        for (int neighbor : graph[cur]) {
+        for (auto neighbor : graph[cur]) {
             if (!used[neighbor]) {
                 q.push(neighbor);
                 used[neighbor] = true;
@@ -57,7 +62,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    for (int i = 1; i < dst.size(); i++) {
+    for (uint64_t i = 1; i < dst.size(); i++) {
         if (dst[i] != -1) {
             std::println("Distance between vertices 0 and {} is {}", i, dst[i]);
         } else {
