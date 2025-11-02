@@ -5,9 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "utils.h"
-
-typedef std::vector<std::vector<int64_t>> graph_t;
+#include "utils.hpp"
 
 using std::queue;
 using std::vector;
@@ -38,7 +36,7 @@ graph_t read_graph(std::string path) {
     return graph;
 }
 
-int main() {
+void test() {
     graph_t graph = read_graph("graph_test.txt");
 
     used = vector<bool>(graph.size(), false);
@@ -69,6 +67,18 @@ int main() {
             std::println("Vertex {} cannot be reached from vertex 0", i);
         }
     }
+}
 
+void test1() {
+    volatile int a = 5;
+    volatile int b = 6;
+    volatile int c = a + b;
+
+    return;
+}
+
+int main() {
+    auto [cycles, ns] = benchmark(test1);
+    std::println("Function benchmarked: {} cycles, {} nanoseconds", cycles, ns);
     return 0;
 }
