@@ -1,5 +1,4 @@
 #include <cstdint>
-#include <fstream>
 #include <print>
 #include <queue>
 #include <string>
@@ -15,25 +14,28 @@ using std::vector;
 vector<bool> used;
 vector<int64_t> dst;
 
-graph_t read_graph(std::string path) {
-    std::ifstream ifstream(path);
-    auto lines = vector<std::string>();
-    graph_t graph = graph_t();
-    if (ifstream.is_open()) {
-        std::string line;
-        int64_t i = 0;
-        while (std::getline(ifstream, line)) {
-            auto nums = split_string(std::move(line), ",");
-            graph.push_back(vector<int64_t>());
-            for (auto& num_str : nums) {
-                graph[i].push_back(std::stoll(num_str));
+vector<int64_t> bfs(graph_t& graph) {
+    auto used = vector<bool>(graph.size(), false);
+    auto distances = vector<int64_t>(graph.size(), -1);
+    queue<int64_t> q;
+    q.push(0);
+    used[0] = true;
+    distances[0] = 0;
+
+    while (!q.empty()) {
+        int64_t cur = q.front();
+        q.pop();
+
+        for (auto neighbor : graph[cur]) {
+            if (!used[neighbor]) {
+                q.push(neighbor);
+                used[neighbor] = true;
+                distances[neighbor] = distances[cur] + 1;
             }
-            ++i;
         }
-        ifstream.close();
     }
 
-    return graph;
+    return distances;
 }
 
 void test() {

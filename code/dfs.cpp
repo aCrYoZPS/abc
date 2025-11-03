@@ -15,33 +15,39 @@ using std::vector;
 vector<bool> used;
 vector<int64_t> dst;
 
-int32_t dfs(graph_t& graph, int64_t v, int64_t p = -1) {
+bool dfs(graph_t& graph, int64_t v, int64_t p = -1) {
     used[v] = true;
 
     for (int64_t u : graph[v]) {
         if (!used[u]) {
-            if (dfs(graph, u, v) == -1) {
-                return -1;
+            if (!dfs(graph, u, v)) {
+                return false;
             }
         } else if (u != p) {
-            return -1;
+            return false;
         }
     }
 
-    return 0;
+    return true;
+}
+
+bool has_cycles(graph_t& graph) {
+    for (auto i = 0; i < graph.size(); i++) {
+        if (!used[i]) {
+            if (!dfs(graph, i)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 int main() {
     int64_t n = 0;
     graph_t graph;
-    for (int i = 0; i < n; i++) {
-        if (!used[i]) {
-            if (dfs(graph, i) == -1) {
-                std::println("Graph has a cycle");
-                return 0;
-            }
-        }
+    if (has_cycles(graph)) {
+        std::println("Graph has a cycle");
+    } else {
+        std::println("Graph has no cycles");
     }
-
-    std::println("Graph has no cycles");
 }
