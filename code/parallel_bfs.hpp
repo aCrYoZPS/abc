@@ -4,5 +4,5 @@
 
 typedef std::vector<std::vector<int64_t>> graph_t;
 
-std::vector<int64_t> parallel_bfs(graph_t &graph);
-#endif // !PARALLEL_BFS_H
+std::vector<int64_t> parallel_bfs(graph_t& graph);
+#endif  // !PARALLEL_BFS_H
