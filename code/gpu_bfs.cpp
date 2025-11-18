@@ -4,6 +4,8 @@
 #include <limits>
 #include <vector>
 
+#include "utils.hpp"
+
 #define INF 1000000000
 
 __global__ void bfs_kernel(int n, const int* row_offsets,
@@ -26,8 +28,7 @@ __global__ void bfs_kernel(int n, const int* row_offsets,
     }
 }
 
-std::vector<int> bfs_hip(int n, const std::vector<std::vector<int>>& adj_list,
-                         int root) {
+std::vector<int> bfs_hip(int n, const graph_t& adj_list, int root) {
     std::vector<int> row_offsets(n + 1, 0);
     int edge_count = 0;
     for (int i = 0; i < n; i++) {
@@ -96,14 +97,14 @@ std::vector<int> bfs_hip(int n, const std::vector<std::vector<int>>& adj_list,
 }
 
 int main() {
-    int n = 4;
-    std::vector<std::vector<int>> adj_list = {{1, 2}, {2}, {0, 3}, {3}};
+    graph_t graph = read_graph("graph_test.txt");
+    int n = graph.size();
     int root = 0;
-    std::vector<int> dist = bfs_hip(n, adj_list, root);
+    auto dst = bfs_hip(n, graph, root);
     std::cout << "Distances from root " << root << ":\n";
     for (int i = 0; i < n; i++) {
         std::cout << "Node " << i << ": "
-                  << (dist[i] == INF ? "INF" : std::to_string(dist[i])) << "\n";
+                  << (dst[i] == INF ? "INF" : std::to_string(dst[i])) << "\n";
     }
     return 0;
 }
