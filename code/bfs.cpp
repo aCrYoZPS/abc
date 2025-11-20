@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "benchmark.hpp"
 #include "parallel_bfs.hpp"
 #include "utils.hpp"
 
@@ -41,41 +42,41 @@ void test() {
     graph_t graph = read_graph("graph_test.txt");
     auto dst = bfs(graph);
 
-    for (uint64_t i = 1; i < dst.size(); i++) {
-        if (dst[i] != -1) {
-            std::println("Distance between vertices 0 and {} is {}", i, dst[i]);
-        } else {
-            std::println("Vertex {} cannot be reached from vertex 0", i);
-        }
-    }
+    // for (uint64_t i = 1; i < dst.size(); i++) {
+    //     if (dst[i] != -1) {
+    //         std::println("Distance between vertices 0 and {} is {}", i,
+    //         dst[i]);
+    //     } else {
+    //         std::println("Vertex {} cannot be reached from vertex 0", i);
+    //     }
+    // }
 }
 
 void test2() {
     graph_t graph = read_graph("graph_test.txt");
     auto dst = parallel_bfs(graph);
 
-    for (uint64_t i = 1; i < dst.size(); i++) {
-        if (dst[i] != -1) {
-            std::println("Distance between vertices 0 and {} is {}", i, dst[i]);
-        } else {
-            std::println("Vertex {} cannot be reached from vertex 0", i);
+    // for (uint64_t i = 1; i < dst.size(); i++) {
+    //     if (dst[i] != -1) {
+    //         std::println("Distance between vertices 0 and {} is {}", i,
+    //         dst[i]);
+    //     } else {
+    //         std::println("Vertex {} cannot be reached from vertex 0", i);
+    //     }
+    // }
+}
+
+int main(int argc, char** argv) {
+    bool parallel = false;
+    if (argc > 1) {
+        if (std::string(argv[1]) == "-p") {
+            parallel = true;
         }
     }
-}
-
-void test1() {
-    volatile int a = 5;
-    volatile int b = 6;
-    volatile int c = a + b;
-
-    return;
-}
-
-int main() {
-    // auto [cycles, ns] = benchmark(test1);
-    // std::println("Function benchmarked: {} cycles, {} nanoseconds", cycles,
-    // ns);
-    test();
-    test2();
+    if (parallel) {
+        auto [cycles, ns] = benchmark(test2);
+    } else {
+        auto [cycles, ns] = benchmark(test);
+    }
     return 0;
 }

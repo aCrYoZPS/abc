@@ -4,3 +4,4 @@ main
 *.pch
 ~*
 *~
+**/.venv
