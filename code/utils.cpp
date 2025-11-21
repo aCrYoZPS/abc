@@ -5,6 +5,9 @@
 
 std::vector<std::string> split_string(const std::string& s,
                                       const std::string& delimiter) {
+    if (s.length() == 0) {
+        return {};
+    }
     std::vector<std::string> tokens;
     size_t start = 0;
     size_t end = s.find(delimiter);
@@ -18,6 +21,7 @@ std::vector<std::string> split_string(const std::string& s,
 
     return tokens;
 }
+
 graph_t read_graph(std::string path) {
     std::ifstream ifstream(path);
     graph_t graph = graph_t();
