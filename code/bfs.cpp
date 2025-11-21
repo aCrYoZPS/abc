@@ -39,31 +39,29 @@ vector<int64_t> bfs(graph_t& graph) {
 }
 
 void test() {
-    graph_t graph = read_graph("graph_test.txt");
+    graph_t graph = read_graph("graphs/graph_15.txt");
     auto dst = bfs(graph);
 
-    // for (uint64_t i = 1; i < dst.size(); i++) {
-    //     if (dst[i] != -1) {
-    //         std::println("Distance between vertices 0 and {} is {}", i,
-    //         dst[i]);
-    //     } else {
-    //         std::println("Vertex {} cannot be reached from vertex 0", i);
-    //     }
-    // }
+    for (uint64_t i = 1; i < dst.size(); i++) {
+        if (dst[i] != -1) {
+            std::println("Distance between vertices 0 and {} is {}", i, dst[i]);
+        } else {
+            std::println("Vertex {} cannot be reached from vertex 0", i);
+        }
+    }
 }
 
 void test2() {
-    graph_t graph = read_graph("graph_test.txt");
+    graph_t graph = read_graph("graphs/graph_15.txt");
     auto dst = parallel_bfs(graph);
 
-    // for (uint64_t i = 1; i < dst.size(); i++) {
-    //     if (dst[i] != -1) {
-    //         std::println("Distance between vertices 0 and {} is {}", i,
-    //         dst[i]);
-    //     } else {
-    //         std::println("Vertex {} cannot be reached from vertex 0", i);
-    //     }
-    // }
+    for (uint64_t i = 1; i < dst.size(); i++) {
+        if (dst[i] != -1) {
+            std::println("Distance between vertices 0 and {} is {}", i, dst[i]);
+        } else {
+            std::println("Vertex {} cannot be reached from vertex 0", i);
+        }
+    }
 }
 
 int main(int argc, char** argv) {
@@ -74,9 +72,9 @@ int main(int argc, char** argv) {
         }
     }
     if (parallel) {
-        auto [cycles, ns] = benchmark(test2);
+        auto [cycles, ns] = benchmark(test2, 3);
     } else {
-        auto [cycles, ns] = benchmark(test);
+        auto [cycles, ns] = benchmark(test, 3);
     }
     return 0;
 }

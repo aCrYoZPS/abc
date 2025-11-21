@@ -1,6 +1,8 @@
 #include "benchmark.hpp"
 
+#include <chrono>
 #include <cstdint>
+#include <ratio>
 #include <vector>
 
 static inline uint64_t rdtsc() {
