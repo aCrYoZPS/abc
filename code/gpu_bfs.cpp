@@ -112,7 +112,7 @@ void test_func() {
 }
 
 int main(int argc, char** argv) {
-    hipSetDevice(0);
+    hipSetDevice(1);
     CsvWriter csv_writer{};
     std::string result_file_name = std::format("bfs_{}.csv", argv[1]);
 
