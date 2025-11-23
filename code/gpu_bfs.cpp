@@ -14,6 +14,7 @@
 int repeats = 10;
 std::vector<int> node_counts = {100,  200,   500,   1000,  2000,
                                 5000, 10000, 20000, 50000, 100000};
+graph_t current_graph;
 int current_node_count = 100;
 
 __global__ void bfs_kernel(int n, const int* row_offsets,
@@ -105,10 +106,7 @@ std::vector<int> bfs_hip(int n, const graph_t& adj_list, int root) {
 }
 
 void test_func() {
-    std::string file_name =
-        std::format("graphs/graph_{}.txt", current_node_count);
-    graph_t graph = read_graph(file_name);
-    volatile auto dst = bfs_hip(graph.size(), graph, 0);
+    volatile auto dst = bfs_hip(current_graph.size(), current_graph, 0);
 }
 
 int main(int argc, char** argv) {
@@ -118,7 +116,11 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < node_counts.size(); ++i) {
         current_node_count = node_counts[i];
+        std::string file_name =
+            std::format("graphs/graph_{}.txt", current_node_count);
+        current_graph = read_graph(file_name);
         std::vector<uint64_t> times{};
+
         for (int i = 0; i < repeats; ++i) {
             times.push_back(benchmark(test_func));
         }

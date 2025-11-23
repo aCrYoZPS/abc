@@ -17,6 +17,7 @@ int repeats = 10;
 std::vector<int> node_counts = {100,  200,   500,   1000,  2000,
                                 5000, 10000, 20000, 50000, 100000};
 int current_node_count = 100;
+graph_t current_graph;
 
 vector<int64_t> bfs(graph_t& graph) {
     auto used = vector<bool>(graph.size(), false);
@@ -42,19 +43,9 @@ vector<int64_t> bfs(graph_t& graph) {
     return distances;
 }
 
-void test() {
-    std::string file_name =
-        std::format("graphs/graph_{}.txt", current_node_count);
-    graph_t graph = read_graph(file_name);
-    volatile auto dst = bfs(graph);
-}
+void test() { volatile auto dst = bfs(current_graph); }
 
-void test2() {
-    std::string file_name =
-        std::format("graphs/graph_{}.txt", current_node_count);
-    graph_t graph = read_graph(file_name);
-    volatile auto dst = parallel_bfs(graph);
-}
+void test2() { volatile auto dst = parallel_bfs(current_graph); }
 
 int main(int argc, char** argv) {
     bool parallel = false;
@@ -80,6 +71,9 @@ int main(int argc, char** argv) {
     for (int i = 0; i < node_counts.size(); ++i) {
         current_node_count = node_counts[i];
         std::vector<uint64_t> times{};
+        std::string file_name =
+            std::format("graphs/graph_{}.txt", current_node_count);
+        current_graph = read_graph(file_name);
         for (int i = 0; i < repeats; ++i) {
             times.push_back(benchmark(test_func));
         }
