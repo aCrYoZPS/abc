@@ -12,6 +12,9 @@ def main():
     data_type = f"{sys.argv[2].split("_")[0]} {sys.argv[2].split(".csv")[0].split("_")[-1]}"
     num_iters = cpu1_data["Iters"].unique()
 
+    cpu1_data["Times"] = cpu1_data["Times"] / 1000
+    cpu2_data["Times"] = cpu2_data["Times"] / 1000
+
     average_times_cpu1 = cpu1_data.groupby("Iters")["Times"].mean()
     average_times_cpu2 = cpu2_data.groupby("Iters")["Times"].mean()
 
@@ -20,7 +23,7 @@ def main():
     ax.plot(num_iters, average_times_cpu2, marker='s', linestyle='--', label='Ryzen 7 7700')
 
     ax.set_xlabel('Number of Nodes')
-    ax.set_ylabel('Time (nanoseconds)')
+    ax.set_ylabel('Time (microseconds)')
     ax.set_title(f'Benchmarking: {data_type}')
     ax.set_xscale('log')
     ax.set_yscale('log')
