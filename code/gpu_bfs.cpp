@@ -12,8 +12,9 @@
 #define INF 1000000000
 
 int repeats = 10;
-std::vector<int> node_counts = {10000, 20000, 50000, 100000};
-int current_node_count = 10000;
+std::vector<int> node_counts = {100,  200,   500,   1000,  2000,
+                                5000, 10000, 20000, 50000, 100000};
+int current_node_count = 100;
 
 __global__ void bfs_kernel(int n, const int* row_offsets,
                            const int* col_indices, int* distances,

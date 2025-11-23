@@ -1,4 +1,3 @@
-import sys
 import random
 from pathlib import Path
 
@@ -30,15 +29,16 @@ def generate_graph(n, edge_probability=0.00035):
 
 
 def main():
-    node_count = int(sys.argv[1])
-    adjacency = generate_graph(node_count)
-    file_path = Path(f"graphs/graph_{node_count}.txt")
-    file_path.parent.mkdir(parents=True, exist_ok=True)
+    node_counts = [100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]
+    for node_count in node_counts:
+        adjacency = generate_graph(node_count)
+        file_path = Path(f"graphs/graph_{node_count}.txt")
+        file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(file_path, "w") as f:
-        for neighbors in adjacency:
-            line = ",".join(map(str, sorted(neighbors)))
-            f.write(line + "\n")
+        with open(file_path, "w") as f:
+            for neighbors in adjacency:
+                line = ",".join(map(str, sorted(neighbors)))
+                f.write(line + "\n")
 
 
 if __name__ == "__main__":
