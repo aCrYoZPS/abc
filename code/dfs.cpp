@@ -1,19 +1,18 @@
 #include <cstdint>
-#include <fstream>
 #include <print>
-#include <queue>
-#include <string>
 #include <vector>
 
+#include "benchmark.hpp"
+#include "csv_writer.hpp"
 #include "utils.hpp"
 
-using std::queue;
 using std::vector;
 
-/*graph_t graph = {{1, 2}, {0, 2}, {0, 1, 3, 4}, {2}, {2}};*/
-/*graph_t graph = {{2, 3}, {2}, {0, 1}, {0}, {5}, {4}};*/
+int repeats = 10;
+vector<int> node_counts = {10000, 20000, 50000, 100000};
+int current_node_count = 10000;
+
 vector<bool> used;
-vector<int64_t> dst;
 
 bool dfs(graph_t& graph, int64_t v, int64_t p = -1) {
     used[v] = true;
@@ -32,6 +31,7 @@ bool dfs(graph_t& graph, int64_t v, int64_t p = -1) {
 }
 
 bool has_cycles(graph_t& graph) {
+    used.assign(graph.size(), false);
     for (auto i = 0; i < graph.size(); i++) {
         if (!used[i]) {
             if (!dfs(graph, i)) {
@@ -42,12 +42,26 @@ bool has_cycles(graph_t& graph) {
     return false;
 }
 
-int main() {
-    int64_t n = 0;
-    graph_t graph;
-    if (has_cycles(graph)) {
-        std::println("Graph has a cycle");
-    } else {
-        std::println("Graph has no cycles");
+void test_func() {
+    std::string file_name =
+        std::format("graphs/graph_{}.txt", current_node_count);
+    graph_t graph = read_graph(file_name);
+    volatile auto cycles = has_cycles(graph);
+}
+
+int main(int argc, char** argv) {
+    CsvWriter csv_writer{};
+    std::string result_file_name = std::format("dfs_{}.csv", argv[1]);
+
+    for (int i = 0; i < node_counts.size(); ++i) {
+        current_node_count = node_counts[i];
+        std::vector<uint64_t> times{};
+        for (int i = 0; i < repeats; ++i) {
+            times.push_back(benchmark(test_func));
+        }
+        csv_writer.WriteValues(current_node_count, times);
     }
+    csv_writer.WriteToFile(result_file_name);
+
+    return 0;
 }

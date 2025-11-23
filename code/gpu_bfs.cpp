@@ -1,12 +1,19 @@
 #include <hip/hip_runtime.h>
 
+#include <format>
 #include <iostream>
 #include <limits>
 #include <vector>
 
+#include "benchmark.hpp"
+#include "csv_writer.hpp"
 #include "utils.hpp"
 
 #define INF 1000000000
+
+int repeats = 10;
+std::vector<int> node_counts = {10000, 20000, 50000, 100000};
+int current_node_count = 10000;
 
 __global__ void bfs_kernel(int n, const int* row_offsets,
                            const int* col_indices, int* distances,
@@ -96,15 +103,26 @@ std::vector<int> bfs_hip(int n, const graph_t& adj_list, int root) {
     return distances;
 }
 
-int main() {
-    graph_t graph = read_graph("graph_test.txt");
-    int n = graph.size();
-    int root = 0;
-    auto dst = bfs_hip(n, graph, root);
-    std::cout << "Distances from root " << root << ":\n";
-    for (int i = 0; i < n; i++) {
-        std::cout << "Node " << i << ": "
-                  << (dst[i] == INF ? "INF" : std::to_string(dst[i])) << "\n";
+void test_func() {
+    std::string file_name =
+        std::format("graphs/graph_{}.txt", current_node_count);
+    graph_t graph = read_graph(file_name);
+    volatile auto dst = bfs_hip(graph.size(), graph, 0);
+}
+
+int main(int argc, char** argv) {
+    hipSetDevice(0);
+    CsvWriter csv_writer{};
+    std::string result_file_name = std::format("bfs_{}.csv", argv[1]);
+
+    for (int i = 0; i < node_counts.size(); ++i) {
+        current_node_count = node_counts[i];
+        std::vector<uint64_t> times{};
+        for (int i = 0; i < repeats; ++i) {
+            times.push_back(benchmark(test_func));
+        }
+        csv_writer.WriteValues(current_node_count, times);
     }
+    csv_writer.WriteToFile(result_file_name);
     return 0;
 }

@@ -1,0 +1,26 @@
+CXX = g++
+CXXFLAGS = -std=c++23 -O2
+
+SRCS = bfs.cpp utils.cpp parallel_bfs.cpp csv_writer.cpp benchmark.cpp
+HDRS = utils.hpp parallel_bfs.hpp csv_writer.hpp benchmark.hpp
+
+# Object files
+OBJS := $(SRCS:.cpp=.o)
+
+# Executable name
+TARGET = benchmark_bfs.out 
+
+# Default rule
+all: $(TARGET)
+
+# Link objects to create executable
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+# Compile .cpp files into .o files
+%.o: %.cpp $(HDRS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean rule to remove build files
+clean:
+	rm -f $(OBJS) $(TARGET)

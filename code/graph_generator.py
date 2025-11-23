@@ -3,15 +3,29 @@ import random
 from pathlib import Path
 
 
-def generate_graph(n: int, edge_probability=0.3):
+def generate_spanning_tree(n):
     adjacency = [set() for _ in range(n)]
+    nodes = list(range(n))
+    random.shuffle(nodes)
+    for i in range(1, n):
+        j = random.randint(0, i - 1)
+        adjacency[nodes[i]].add(nodes[j])
+        adjacency[nodes[j]].add(nodes[i])
+    return adjacency
 
+
+def add_random_edges(adjacency, edge_probability):
+    n = len(adjacency)
     for i in range(n):
         for j in range(i + 1, n):
-            if random.random() < edge_probability:
+            if j not in adjacency[i] and random.random() < edge_probability:
                 adjacency[i].add(j)
                 adjacency[j].add(i)
 
+
+def generate_graph(n, edge_probability=0.00035):
+    adjacency = generate_spanning_tree(n)
+    add_random_edges(adjacency, edge_probability)
     return adjacency
 
 
@@ -21,7 +35,7 @@ def main():
     file_path = Path(f"graphs/graph_{node_count}.txt")
     file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(f"graphs/graph_{node_count}.txt", "w") as f:
+    with open(file_path, "w") as f:
         for neighbors in adjacency:
             line = ",".join(map(str, sorted(neighbors)))
             f.write(line + "\n")

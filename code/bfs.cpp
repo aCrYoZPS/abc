@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <cstdint>
 #include <print>
 #include <queue>
@@ -5,14 +6,16 @@
 #include <vector>
 
 #include "benchmark.hpp"
+#include "csv_writer.hpp"
 #include "parallel_bfs.hpp"
 #include "utils.hpp"
 
 using std::queue;
 using std::vector;
 
-/*graph_t graph = {{1, 2}, {0, 2}, {0, 1, 3, 4}, {2}, {2}};*/
-/*graph_t graph = {{2, 3}, {2}, {0, 1}, {0}, {5}, {4}};*/
+int repeats = 10;
+std::vector<int> node_counts = {10000, 20000, 50000, 100000};
+int current_node_count = 10000;
 
 vector<int64_t> bfs(graph_t& graph) {
     auto used = vector<bool>(graph.size(), false);
@@ -39,42 +42,49 @@ vector<int64_t> bfs(graph_t& graph) {
 }
 
 void test() {
-    graph_t graph = read_graph("graphs/graph_15.txt");
-    auto dst = bfs(graph);
-
-    for (uint64_t i = 1; i < dst.size(); i++) {
-        if (dst[i] != -1) {
-            std::println("Distance between vertices 0 and {} is {}", i, dst[i]);
-        } else {
-            std::println("Vertex {} cannot be reached from vertex 0", i);
-        }
-    }
+    std::string file_name =
+        std::format("graphs/graph_{}.txt", current_node_count);
+    graph_t graph = read_graph(file_name);
+    volatile auto dst = bfs(graph);
 }
 
 void test2() {
-    graph_t graph = read_graph("graphs/graph_15.txt");
-    auto dst = parallel_bfs(graph);
-
-    for (uint64_t i = 1; i < dst.size(); i++) {
-        if (dst[i] != -1) {
-            std::println("Distance between vertices 0 and {} is {}", i, dst[i]);
-        } else {
-            std::println("Vertex {} cannot be reached from vertex 0", i);
-        }
-    }
+    std::string file_name =
+        std::format("graphs/graph_{}.txt", current_node_count);
+    graph_t graph = read_graph(file_name);
+    volatile auto dst = parallel_bfs(graph);
 }
 
 int main(int argc, char** argv) {
     bool parallel = false;
-    if (argc > 1) {
-        if (std::string(argv[1]) == "-p") {
+    CsvWriter csv_writer{};
+    if (argc > 2) {
+        auto argv2 = std::string(argv[2]);
+        if (argv2.starts_with("-p")) {
             parallel = true;
         }
     }
+
+    std::string result_file_name = std::format("bfs_{}", argv[1]);
+
+    void (*test_func)();
     if (parallel) {
-        auto [cycles, ns] = benchmark(test2, 3);
+        test_func = test2;
+        result_file_name += "-multithreaded.csv";
     } else {
-        auto [cycles, ns] = benchmark(test, 3);
+        test_func = test;
+        result_file_name += "-singlethreaded.csv";
     }
+
+    for (int i = 0; i < node_counts.size(); ++i) {
+        current_node_count = node_counts[i];
+        std::vector<uint64_t> times{};
+        for (int i = 0; i < repeats; ++i) {
+            times.push_back(benchmark(test_func));
+        }
+        csv_writer.WriteValues(current_node_count, times);
+    }
+    csv_writer.WriteToFile(result_file_name);
+
     return 0;
 }

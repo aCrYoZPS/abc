@@ -1,28 +1,38 @@
 import sys
 
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import pandas as pd
 
 
 def main():
     file_name = sys.argv[1]
-    cpu1_data = pd.read_csv(sys.argv[2], sep=";")
-    cpu2_data = pd.read_csv(sys.argv[3], sep=";")
-    data_type = sys.argv[2].split(".csv")[0].split("_")[-1]
-    num_iters = cpu1_data["Iters"]
+    cpu1_data: pd.DataFrame = pd.read_csv(sys.argv[2], sep=";")
+    cpu2_data: pd.DataFrame = pd.read_csv(sys.argv[3], sep=";")
+    data_type = f"{sys.argv[2].split("_")[0]} {sys.argv[2].split(".csv")[0].split("_")[-1]}"
+    num_iters = cpu1_data["Iters"].unique()
 
-    times_cpu1 = cpu1_data["Times"]
-    times_cpu2 = cpu2_data["Times"]
+    average_times_cpu1 = cpu1_data.groupby("Iters")["Times"].mean()
+    average_times_cpu2 = cpu2_data.groupby("Iters")["Times"].mean()
 
-    plt.plot(num_iters, times_cpu1, marker='o', linestyle='-', label='CPU 1')
-    plt.plot(num_iters, times_cpu2, marker='s', linestyle='--', label='CPU 2')
+    fig, ax = plt.subplots(figsize=(8, 10))
+    ax.plot(num_iters, average_times_cpu1, marker='o', linestyle='-', label='Ryzen 5 3500U')
+    ax.plot(num_iters, average_times_cpu2, marker='s', linestyle='--', label='Ryzen 7 7700')
 
-    plt.xlabel('Number of Nodes')
-    plt.ylabel('Time (nanoseconds)')
-    plt.title(f'Benchmarking: {data_type}')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.legend()
+    ax.set_xlabel('Number of Nodes')
+    ax.set_ylabel('Time (nanoseconds)')
+    ax.set_title(f'Benchmarking: {data_type}')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+    ax.set_xticks(num_iters)
+    ax.set_yticks(list(average_times_cpu1) + list(average_times_cpu2))
+    ax.tick_params(axis='y', labelrotation=45)
+
+    ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+    ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
+
+    ax.legend()
     plt.savefig(f"../media/{file_name}")
     plt.show()
 
