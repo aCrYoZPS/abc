@@ -20,19 +20,15 @@ def main():
     average_times_cpu1 = cpu1_data.groupby("Iters")["Times"].mean()
     average_times_cpu2 = cpu2_data.groupby("Iters")["Times"].mean()
 
-    fig, ax = plt.subplots(figsize=(10, 8))
-    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     ax.plot(num_iters, average_times_cpu1, marker='o', linestyle='-', label='Ryzen 5 3500U')
     ax.plot(num_iters, average_times_cpu2, marker='s', linestyle='--', label='Ryzen 7 7700')
 
     ax.set_xlabel('Number of Nodes')
     ax.set_ylabel('Time (microseconds)')
     ax.set_title(f'Benchmarking: {data_type}')
-    # ax.set_xscale('log')
-    # ax.set_yscale('log')
 
     ax.set_xticks(num_iters)
-    # ax.set_yticks(list(average_times_cpu1) + list(average_times_cpu2))
     ax.tick_params(axis='x', labelrotation=45)
 
     ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
